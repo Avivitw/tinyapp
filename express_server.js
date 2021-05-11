@@ -4,8 +4,15 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");//set ejs as the view engine
 
 const generateRandomString = function() {
+  //returns a string of 6 random alphanumeric characters
+    var result = [];
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for ( var i = 0; i <= 5; i++ ) {
+      result.push(characters.charAt(Math.floor(Math.random() * characters.length)));
+   }
+   return result.join('');
+}
 
-};
 
 
 
@@ -29,6 +36,9 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  let shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL;
+  console.log(`urlDB`, urlDatabase);
 });
 
 app.get("/urls/new", (req, res) => {
