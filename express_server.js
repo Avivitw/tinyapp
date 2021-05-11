@@ -5,13 +5,13 @@ app.set("view engine", "ejs");//set ejs as the view engine
 
 const generateRandomString = function() {
   //returns a string of 6 random alphanumeric characters
-    var result = [];
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for ( var i = 0; i <= 5; i++ ) {
-      result.push(characters.charAt(Math.floor(Math.random() * characters.length)));
-   }
-   return result.join('');
-}
+  let result = [];
+  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i <= 5; i++) {
+    result.push(characters.charAt(Math.floor(Math.random() * characters.length)));
+  }
+  return result.join('');
+};
 
 
 
@@ -35,10 +35,10 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
-   let shortURL = generateRandomString();
+  let shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
   // console.log(`urlDB`, urlDatabase);
-  res.redirect(`/urls/${shortURL}`)
+  res.redirect(`/urls/${shortURL}`);
 
 });
 
@@ -62,6 +62,6 @@ app.get("/hello", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`The app listening on port ${PORT}!`);
 });
 
