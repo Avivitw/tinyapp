@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");//set ejs as the view engine
-var cookieParser = require('cookie-parser');
+let cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
 const generateRandomString = function() {
@@ -34,13 +34,26 @@ app.get("/", (req, res) => {
 app.post("/login", (req, res) => {
   res.cookie('username', req.body.username);
   res.redirect("/urls");
- });
+});
 
 //Logout Routes
- app.post("/logout", (req, res) => {
+app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
- });
+});
+
+//Register Routes
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+// //Register submit handler
+// app.post("/register", (req, res) => {
+//   users[req.body.username] = req.body.password;
+//   console.log(JSON.stringify(users));
+//   res.cookie("user",req.body.username);
+//   res.redirect('/profile');
+// });
 
 //URLS Routes
 app.get("/urls", (req, res) => {
@@ -70,8 +83,9 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//URLS short submit handler
 app.post("/urls/:shortURL", (req, res) => {
-   urlDatabase[req.params.shortURL] = req.body.newUrl;
+  urlDatabase[req.params.shortURL] = req.body.newUrl;
   res.redirect("/urls");
 });
 
