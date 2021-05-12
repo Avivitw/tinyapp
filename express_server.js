@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");//set ejs as the view engine
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 const generateRandomString = function() {
   //returns a string of 6 random alphanumeric characters
@@ -27,6 +29,11 @@ const urlDatabase = {
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
+
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("/urls");
+ });
 
 app.get("/urls", (req, res) => {
   const templateVars = {urls: urlDatabase};
@@ -55,7 +62,6 @@ app.post("/urls/:shortURL", (req, res) => {
    urlDatabase[req.params.shortURL] = req.body.newUrl;
   res.redirect("/urls");
 });
-
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];

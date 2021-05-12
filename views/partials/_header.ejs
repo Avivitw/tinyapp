@@ -4,14 +4,16 @@
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <p><form method="POST" action="/login">
-      <input type="text" class="form-control" name="username"/>
-      <button class="btn btn-primary btn-lg">Submit</button></form></p>
+    
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
+    <p><form method="POST" action="/login" class="form-inline">
+      <input type="text" class="form-control" name="username" placeholder="Username"/>
+      <button class="btn btn-primary">Login</button></form></p>
   </nav>
+  
 </header>
