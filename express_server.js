@@ -15,7 +15,11 @@ const generateRandomString = function() {
   return result.join('');
 };
 
-
+const emailLookup = function(email) {
+  //convert users to array using obj.values
+  let arrayValues = Object.values(users);
+  return arrayValues.find(user => email === user.email);
+};
 
 
 app.use(express.urlencoded({extended: true}));
@@ -58,19 +62,31 @@ app.get("/register", (req, res) => {
 //Register submit handler
 app.post("/register", (req, res) => {
   let randomId = generateRandomString();
-  // console.log(`before`, JSON.stringify(users));
-  users[randomId] = {id: randomId,
-    email: req.body.email,
-    password: req.body.password,
+  const email = req.body.email;
+  const password = req.body.password;
+  //checking if the email or password is am empty strings
+  if (password.length === 0 || email.length === 0){
+    res.status(400).send("Email or Password is invalid! ");
+    return;
   };
-  // console.log(`after`, JSON.stringify(users));
+  //checking if the email already exists
+  if (emailLookup(email)) {
+    res.status(400).send("Email already exists! ");
+    return;
+  }
+  users[randomId] = {id: randomId,
+    email: email,
+    password: password
+  };
+  console.log(`after`, JSON.stringify(users));
   res.cookie("user_id",randomId);
   res.redirect('/urls');
 });
 
 //URLS Routes
 app.get("/urls", (req, res) => {
-  let user = users[req.cookies[`user_id`]]
+  let user = users[req.cookies[`user_id`]];
+  console.log(`user`, user);
   const templateVars = {urls: urlDatabase, user: user};
   // console.log(`vars`, templateVars);
   res.render("urls_index", templateVars);
