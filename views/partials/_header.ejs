@@ -12,11 +12,17 @@
       </div>
     </div>
     <p>
-      
-      <span><%= username %> </span>
-      <form method="POST" action="/login" class="form-inline">
-      <input type="text" class="form-control" name="username" placeholder="Username"/>
-      <button class="btn btn-primary">Login</button></form></p>
+      <%if (!username) { %>
+        <form method="POST" action="/login" class="form-inline">
+        <input type="text" class="form-control" name="username" placeholder="Username"/>
+        <button class="btn btn-primary">Login</button></form>
+                
+      <% }else{ %>
+        <form method="POST" action="/logout" class="form-inline">
+          <div class="form-group"> <label><%= username %> </label>
+        <button class="btn btn-primary">Logout</button></div></form>
+      <% } %>
+    </p>
   </nav>
   
 </header>
