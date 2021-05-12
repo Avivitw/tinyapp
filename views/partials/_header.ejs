@@ -13,14 +13,13 @@
     </div>
     <p>
       <%if (!user) { %>
-        <form method="POST" action="/login" class="form-inline">
-        <input type="text" class="form-control" name="username" placeholder="Username"/>
-        <button class="btn btn-primary">Login</button></form>
+        <a class="navbar-link" href="/register">Register</a>
+        <a class="navbar-link" href="/login">Login</a>
                 
       <% }else{ %>
         <form method="POST" action="/logout" class="form-inline">
           <div class="form-group"> <label><%= user.email %> </label>
-        <button class="btn btn-primary">Logout</button></div></form>
+        <button class="btn btn-primary" type="submit">Logout</button></div></form>
       <% } %>
     </p>
   </nav>
