@@ -4,9 +4,12 @@ const PORT = 8080; // default port 8080
 const morgan = require(`morgan`);
 const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");//set ejs as the view engine
-let cookieParser = require('cookie-parser');
-app.use(cookieParser());
+let cookieSession = require('cookie-session');
 app.use(morgan(`dev`));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['userId']
+}));
 
 const generateRandomString = function() {
   //returns a string of 6 random alphanumeric characters
@@ -26,7 +29,7 @@ const emailLookup = function(email) {
 
 //check if the user logedin if not redirect him to login page
 const isLogedIn = function(req) {
-  let user = users[req.cookies[`user_id`]];
+  let user = users[req.session.userId];
   if (!user) {
     
     return false;
@@ -92,13 +95,13 @@ app.post("/login", (req, res) => {
     return;
   }
   const userId = emailLookup(email).id;
-  res.cookie("user_id",userId);
+  req.session.userId = userId;
   res.redirect("/urls");
 });
 
 //Logout Routes
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect("/urls");
 });
 
@@ -131,15 +134,15 @@ app.post("/register", (req, res) => {
     password: hashedPassword
   };
   console.log(`after`, JSON.stringify(users));
-  res.cookie("user_id",randomId);
+  req.session.userId = randomId;
   res.redirect('/urls');
 });
 
 //URLS Routes
 app.get("/urls", (req, res) => {
   //check if the user logedin with isLogedIn
-  let user = users[req.cookies[`user_id`]];
-  let urls = urlsForUser(req.cookies[`user_id`]);
+  let user = users[req.session.userId];
+  let urls = urlsForUser(req.session.userId);
   console.log(`users`, users);
   let templateVars = {urls: urls, user: user, message: undefined};
   if (!isLogedIn(req)) {
@@ -158,7 +161,7 @@ app.post("/urls", (req, res) => {
   }
   console.log(req.body);  // Log the POST request body to the console
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies[`user_id`]};
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.userId};
   // console.log(`urlDB`, urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 
@@ -171,7 +174,7 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/login");
     return;
   }
-  let user = users[req.cookies[`user_id`]];
+  let user = users[req.session.userId];
   const templateVars = {user: user};
   res.render("urls_new", templateVars);
 });
@@ -183,9 +186,9 @@ app.get("/urls/:shortURL", (req, res) => {
     res.render("message", {message: "Please log in...", user: undefined});
     return;
   }
-  let user = users[req.cookies[`user_id`]];
+  let user = users[req.session.userId];
   //check if the user has this url
-  if (!urlsForUser(req.cookies[`user_id`])[req.params.shortURL]) {
+  if (!urlsForUser(req.session.userId)[req.params.shortURL]) {
     res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
     return;
   }
@@ -201,8 +204,8 @@ app.post("/urls/:shortURL", (req, res) => {
     return;
   }
   //check if the user has this url
-  if (!urlsForUser(req.cookies[`user_id`])[req.params.shortURL]) {
-    let user = users[req.cookies[`user_id`]];
+  if (!urlsForUser(req.session.userId)[req.params.shortURL]) {
+    let user = users[req.session.userId];
     res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
     return;
   }
@@ -218,8 +221,8 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     return;
   }
   //check if the user has this url
-  if (!urlsForUser(req.cookies[`user_id`])[req.params.shortURL]) {
-    let user = users[req.cookies[`user_id`]];
+  if (!urlsForUser(req.session.userId)[req.params.shortURL]) {
+    let user = users[req.session.userId];
     res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
     return;
   }
