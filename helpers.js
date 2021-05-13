@@ -4,4 +4,4 @@ const getUserByEmail = function(email, database) {
   return arrayValues.find(user => email === user.email);
 };
 
-module.exports =  getUserByEmail;
+module.exports =  { getUserByEmail };

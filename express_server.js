@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bcrypt = require("bcrypt");
-const getUserByEmail = require("./helpers");
+const { getUserByEmail } = require("./helpers");
 app.set("view engine", "ejs");//set ejs as the view engine
 let cookieSession = require("cookie-session");
 app.use(morgan(`dev`));
@@ -87,7 +87,8 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   //checking if the email already exists
-  if (!getUserByEmail(email, users) || bcrypt.compareSync(password, getUserByEmail(email, users).password)) {
+  console.log(`Login`, users,getUserByEmail(email, users));
+  if (!getUserByEmail(email, users) || !bcrypt.compareSync(password, getUserByEmail(email, users).password)) {
     res.status(403).send("Email or passowrd are not valid");
     return;
   }
