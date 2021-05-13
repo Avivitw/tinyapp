@@ -22,27 +22,41 @@ const emailLookup = function(email) {
 };
 
 //check if the user logedin if not redirect him to login page
-const isLogedIn = function(req, res) {
+const isLogedIn = function(req) {
   let user = users[req.cookies[`user_id`]]
   if (!user) {
-    res.redirect("/login");
+    
     return false;
   };
   return true;
 };
 
+const urlsForUser = function(userId) {
+  let arrayUrls = Object.entries(urlDatabase);
+  arrayUrls = arrayUrls.filter(url => userId === url[1].userID);
+  let objUrls = {};
+  for (const url of arrayUrls) {
+    objUrls[url[0]]= url[1];
+}
+   return objUrls;
+};
 
 app.use(express.urlencoded({extended: true}));
+
 //*******Data*************
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "jhgjg" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "jhgjg" }
+  "9sm5xK": { longURL: "http://www.google.com", userID: "bboop" }
 };
+
+// console.log(`urlsforusers`, urlsForUser('jhgjg'));
+// console.log(`obj.entries`, Object.entries(urlDatabase));
+
 
 const users = { 
   "jhgjg": {
     id: "jhgjg", 
-    email: "user@example.com", 
+    email: "wavivit@gmail.com", 
     password: "12345"
   },
   "bboop": {
@@ -120,12 +134,13 @@ app.post("/register", (req, res) => {
 //URLS Routes
 app.get("/urls", (req, res) => {
     //check if the user logedin with isLogedIn
-    if (!isLogedIn(req, res)){
-      return;
+    let user = users[req.cookies[`user_id`]];
+    let urls = urlsForUser(req.cookies[`user_id`]);
+    console.log(`users`, users);
+    let templateVars = {urls: urls, user: user, message: undefined};
+    if (!isLogedIn(req)){
+      templateVars = {urls: {}, user: user, message: "Please log in..."};
     };
-  let user = users[req.cookies[`user_id`]];
-  console.log(`users`, users);
-  const templateVars = {urls: urlDatabase, user: user};
   // console.log(`vars`, templateVars);
   res.render("urls_index", templateVars);
 });
@@ -133,7 +148,8 @@ app.get("/urls", (req, res) => {
 //URLS handler
 app.post("/urls", (req, res) => {
     //check if the user logedin with isLogedIn
-    if (!isLogedIn(req, res)){
+    if (!isLogedIn(req)){
+      res.redirect("/login");
       return;
     };
   console.log(req.body);  // Log the POST request body to the console
@@ -147,7 +163,8 @@ app.post("/urls", (req, res) => {
 //URLS/new Routes
 app.get("/urls/new", (req, res) => {
   //check if the user logedin with isLogedIn
-  if (!isLogedIn(req, res)){
+  if (!isLogedIn(req)){
+    res.redirect("/login");
     return;
   }
   let user = users[req.cookies[`user_id`]];
@@ -155,13 +172,19 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-//URLS
+//Display single URL
 app.get("/urls/:shortURL", (req, res) => {
   //check if the user logedin with isLogedIn
-  if (!isLogedIn(req, res)){
+  if (!isLogedIn(req)){
+    res.render("message", {message: "Please log in...", user: undefined});
     return;
-  };
+  }
   let user = users[req.cookies[`user_id`]]
+  //check if the user has this url
+  if (!urlsForUser(req.cookies[`user_id`])[req.params.shortURL]) {
+    res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
+    return;
+  }
   const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: user};
   res.render("urls_show", templateVars);
 });
@@ -169,19 +192,33 @@ app.get("/urls/:shortURL", (req, res) => {
 //URLS update submit handler
 app.post("/urls/:shortURL", (req, res) => {
   //check if the user logedin with isLogedIn
-  if (!isLogedIn(req, res)){
+  if (!isLogedIn(req)){
+    res.render("message", {message: "Please log in...", user: undefined});
     return;
   };
+  //check if the user has this url
+  if (!urlsForUser(req.cookies[`user_id`])[req.params.shortURL]) {
+    let user = users[req.cookies[`user_id`]]
+    res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
+    return;
+  }
   urlDatabase[req.params.shortURL].longURL = req.body.newUrl;
   res.redirect("/urls");
 });
 
 //URL delete Route
 app.post("/urls/:shortURL/delete", (req, res) => {
-    //check if the user logedin with isLogedIn
-    if (!isLogedIn(req, res)){
-      return;
-    };
+  //check if the user logedin with isLogedIn
+  if (!isLogedIn(req)){
+    res.render("message", {message: "Please log in...", user: undefined});
+    return;
+  };
+  //check if the user has this url
+  if (!urlsForUser(req.cookies[`user_id`])[req.params.shortURL]) {
+    let user = users[req.cookies[`user_id`]]
+    res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
+    return;
+  }
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
