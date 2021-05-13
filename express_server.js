@@ -21,7 +21,7 @@ const generateRandomString = function() {
   return result.join('');
 };
 
-const emailLookup = function(email) {
+const getUserByEmail = function(email, database) {
   //convert users to array using obj.values, returns a user object
   let arrayValues = Object.values(users);
   return arrayValues.find(user => email === user.email);
@@ -90,11 +90,11 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   //checking if the email already exists
-  if (!emailLookup(email) || bcrypt.compareSync(password, emailLookup(email).password)) {
+  if (!getUserByEmail(email, users) || bcrypt.compareSync(password, getUserByEmail(email, users).password)) {
     res.status(403).send("Email or passowrd are not valid");
     return;
   }
-  const userId = emailLookup(email).id;
+  const userId = getUserByEmail(email, users).id;
   req.session.userId = userId;
   res.redirect("/urls");
 });
@@ -123,7 +123,7 @@ app.post("/register", (req, res) => {
     return;
   }
   //checking if the email already exists
-  if (emailLookup(email)) {
+  if (getUserByEmail(email, users)) {
     res.status(400).send("Email already exists! ");
     return;
   }
