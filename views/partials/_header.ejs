@@ -11,17 +11,19 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <p>
+    <div>
       <%if (!user) { %>
-        <a class="navbar-link" href="/register">Register</a>
-        <a class="navbar-link" href="/login">Login</a>
+        <div class="navbar-nav">
+          <a class="nav-item nav-link" href="/login">Login</a>
+        <a class="nav-item nav-link" href="/register">Register</a>
+      </div>
                 
-      <% }else{ %>
+      <% } else { %>
         <form method="POST" action="/logout" class="form-inline">
-          <div class="form-group"> <label><%= user.email %> </label>
+          <div class="form-group"> <label style="font-weight: bold; margin-right: 1em;"><%= user.email %> </label>
         <button class="btn btn-primary" type="submit">Logout</button></div></form>
       <% } %>
-    </p>
+          </div>
   </nav>
   
 </header>

@@ -44,26 +44,38 @@ app.get("/", (req, res) => {
 
 //Login Route
 app.get("/login", (req, res) => {
-  res.render("login");
+  let user = users[req.cookies[`user_id`]];
+  const templateVars = {urls: urlDatabase, user: undefined};
+  res.render("login", templateVars);
 });
 
 
 
 //Login submit handler
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
+  const email = req.body.email;
+  const password = req.body.password;
+//checking if the email already exists
+  if (!emailLookup(email) || password !== emailLookup(email).password) {
+    res.status(403).send("Email or passowrd are not valid");
+    return;
+  };
+  const user_id = emailLookup(email).id;
+  res.cookie("user_id",user_id);
   res.redirect("/urls");
 });
 
 //Logout Routes
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 
 //Register Routes
 app.get("/register", (req, res) => {
-  res.render("register");
+  let user = users[req.cookies[`user_id`]];
+  const templateVars = {urls: urlDatabase, user: undefined};
+  res.render("register", templateVars);
 });
 
 //Register submit handler
@@ -93,7 +105,7 @@ app.post("/register", (req, res) => {
 //URLS Routes
 app.get("/urls", (req, res) => {
   let user = users[req.cookies[`user_id`]];
-  console.log(`user`, user);
+  console.log(`users`, users);
   const templateVars = {urls: urlDatabase, user: user};
   // console.log(`vars`, templateVars);
   res.render("urls_index", templateVars);
