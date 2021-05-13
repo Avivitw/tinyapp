@@ -23,11 +23,11 @@ const emailLookup = function(email) {
 
 //check if the user logedin if not redirect him to login page
 const isLogedIn = function(req) {
-  let user = users[req.cookies[`user_id`]]
+  let user = users[req.cookies[`user_id`]];
   if (!user) {
     
     return false;
-  };
+  }
   return true;
 };
 
@@ -36,9 +36,9 @@ const urlsForUser = function(userId) {
   arrayUrls = arrayUrls.filter(url => userId === url[1].userID);
   let objUrls = {};
   for (const url of arrayUrls) {
-    objUrls[url[0]]= url[1];
-}
-   return objUrls;
+    objUrls[url[0]] = url[1];
+  }
+  return objUrls;
 };
 
 app.use(express.urlencoded({extended: true}));
@@ -53,18 +53,18 @@ const urlDatabase = {
 // console.log(`obj.entries`, Object.entries(urlDatabase));
 
 
-const users = { 
+const users = {
   "jhgjg": {
-    id: "jhgjg", 
-    email: "wavivit@gmail.com", 
+    id: "jhgjg",
+    email: "wavivit@gmail.com",
     password: "12345"
   },
   "bboop": {
-    id: "bboop", 
-    email: "vivi@example.com", 
+    id: "bboop",
+    email: "vivi@example.com",
     password: "qwert"
   }
-}
+};
 
 //*********Routes***********
 app.get("/", (req, res) => {
@@ -73,7 +73,6 @@ app.get("/", (req, res) => {
 
 //Login Route
 app.get("/login", (req, res) => {
-  let user = users[req.cookies[`user_id`]];
   const templateVars = { user: undefined };
   res.render("login", templateVars);
 });
@@ -84,13 +83,13 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-//checking if the email already exists
+  //checking if the email already exists
   if (!emailLookup(email) || password !== emailLookup(email).password) {
     res.status(403).send("Email or passowrd are not valid");
     return;
-  };
-  const user_id = emailLookup(email).id;
-  res.cookie("user_id",user_id);
+  }
+  const userId = emailLookup(email).id;
+  res.cookie("user_id",userId);
   res.redirect("/urls");
 });
 
@@ -102,7 +101,6 @@ app.post("/logout", (req, res) => {
 
 //Register Routes
 app.get("/register", (req, res) => {
-  let user = users[req.cookies[`user_id`]];
   const templateVars = { user: undefined };
   res.render("register", templateVars);
 });
@@ -113,10 +111,10 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   //checking if the email or password is am empty strings
-  if (password.length === 0 || email.length === 0){
+  if (password.length === 0 || email.length === 0) {
     res.status(400).send("Email or Password is invalid! ");
     return;
-  };
+  }
   //checking if the email already exists
   if (emailLookup(email)) {
     res.status(400).send("Email already exists! ");
@@ -133,25 +131,25 @@ app.post("/register", (req, res) => {
 
 //URLS Routes
 app.get("/urls", (req, res) => {
-    //check if the user logedin with isLogedIn
-    let user = users[req.cookies[`user_id`]];
-    let urls = urlsForUser(req.cookies[`user_id`]);
-    console.log(`users`, users);
-    let templateVars = {urls: urls, user: user, message: undefined};
-    if (!isLogedIn(req)){
-      templateVars = {urls: {}, user: user, message: "Please log in..."};
-    };
+  //check if the user logedin with isLogedIn
+  let user = users[req.cookies[`user_id`]];
+  let urls = urlsForUser(req.cookies[`user_id`]);
+  console.log(`users`, users);
+  let templateVars = {urls: urls, user: user, message: undefined};
+  if (!isLogedIn(req)) {
+    templateVars = {urls: {}, user: user, message: "Please log in..."};
+  }
   // console.log(`vars`, templateVars);
   res.render("urls_index", templateVars);
 });
 
 //URLS handler
 app.post("/urls", (req, res) => {
-    //check if the user logedin with isLogedIn
-    if (!isLogedIn(req)){
-      res.redirect("/login");
-      return;
-    };
+  //check if the user logedin with isLogedIn
+  if (!isLogedIn(req)) {
+    res.redirect("/login");
+    return;
+  }
   console.log(req.body);  // Log the POST request body to the console
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies[`user_id`]};
@@ -163,7 +161,7 @@ app.post("/urls", (req, res) => {
 //URLS/new Routes
 app.get("/urls/new", (req, res) => {
   //check if the user logedin with isLogedIn
-  if (!isLogedIn(req)){
+  if (!isLogedIn(req)) {
     res.redirect("/login");
     return;
   }
@@ -175,11 +173,11 @@ app.get("/urls/new", (req, res) => {
 //Display single URL
 app.get("/urls/:shortURL", (req, res) => {
   //check if the user logedin with isLogedIn
-  if (!isLogedIn(req)){
+  if (!isLogedIn(req)) {
     res.render("message", {message: "Please log in...", user: undefined});
     return;
   }
-  let user = users[req.cookies[`user_id`]]
+  let user = users[req.cookies[`user_id`]];
   //check if the user has this url
   if (!urlsForUser(req.cookies[`user_id`])[req.params.shortURL]) {
     res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
@@ -192,13 +190,13 @@ app.get("/urls/:shortURL", (req, res) => {
 //URLS update submit handler
 app.post("/urls/:shortURL", (req, res) => {
   //check if the user logedin with isLogedIn
-  if (!isLogedIn(req)){
+  if (!isLogedIn(req)) {
     res.render("message", {message: "Please log in...", user: undefined});
     return;
-  };
+  }
   //check if the user has this url
   if (!urlsForUser(req.cookies[`user_id`])[req.params.shortURL]) {
-    let user = users[req.cookies[`user_id`]]
+    let user = users[req.cookies[`user_id`]];
     res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
     return;
   }
@@ -209,13 +207,13 @@ app.post("/urls/:shortURL", (req, res) => {
 //URL delete Route
 app.post("/urls/:shortURL/delete", (req, res) => {
   //check if the user logedin with isLogedIn
-  if (!isLogedIn(req)){
+  if (!isLogedIn(req)) {
     res.render("message", {message: "Please log in...", user: undefined});
     return;
-  };
+  }
   //check if the user has this url
   if (!urlsForUser(req.cookies[`user_id`])[req.params.shortURL]) {
-    let user = users[req.cookies[`user_id`]]
+    let user = users[req.cookies[`user_id`]];
     res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
     return;
   }
