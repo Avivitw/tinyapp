@@ -1,15 +1,17 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const morgan = require(`morgan`);
-const bcrypt = require('bcrypt');
+const morgan = require("morgan");
+const bcrypt = require("bcrypt");
+const getUserByEmail = require("./helpers");
 app.set("view engine", "ejs");//set ejs as the view engine
-let cookieSession = require('cookie-session');
+let cookieSession = require("cookie-session");
 app.use(morgan(`dev`));
 app.use(cookieSession({
   name: 'session',
   keys: ['userId']
 }));
+
 
 const generateRandomString = function() {
   //returns a string of 6 random alphanumeric characters
@@ -21,11 +23,6 @@ const generateRandomString = function() {
   return result.join('');
 };
 
-const getUserByEmail = function(email, database) {
-  //convert users to array using obj.values, returns a user object
-  let arrayValues = Object.values(users);
-  return arrayValues.find(user => email === user.email);
-};
 
 //check if the user logedin if not redirect him to login page
 const isLogedIn = function(req) {
