@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const morgan = require(`morgan`);
+const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");//set ejs as the view engine
 let cookieParser = require('cookie-parser');
 app.use(cookieParser());
@@ -18,7 +19,7 @@ const generateRandomString = function() {
 };
 
 const emailLookup = function(email) {
-  //convert users to array using obj.values
+  //convert users to array using obj.values, returns a user object
   let arrayValues = Object.values(users);
   return arrayValues.find(user => email === user.email);
 };
@@ -59,7 +60,7 @@ const users = {
   "jhgjg": {
     id: "jhgjg",
     email: "wavivit@gmail.com",
-    password: "12345"
+    password: "$2b$10$QvHh8fiExRZwJST2pR19teDMKHydjYfiLEbLBWattCs8er2vMd6c6"
   },
   "bboop": {
     id: "bboop",
@@ -86,7 +87,7 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   //checking if the email already exists
-  if (!emailLookup(email) || password !== emailLookup(email).password) {
+  if (!emailLookup(email) || bcrypt.compareSync(password, emailLookup(email).password)) {
     res.status(403).send("Email or passowrd are not valid");
     return;
   }
@@ -112,6 +113,7 @@ app.post("/register", (req, res) => {
   let randomId = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   //checking if the email or password is am empty strings
   if (password.length === 0 || email.length === 0) {
     res.status(400).send("Email or Password is invalid! ");
@@ -122,9 +124,11 @@ app.post("/register", (req, res) => {
     res.status(400).send("Email already exists! ");
     return;
   }
+
+
   users[randomId] = {id: randomId,
     email: email,
-    password: password
+    password: hashedPassword
   };
   console.log(`after`, JSON.stringify(users));
   res.cookie("user_id",randomId);
