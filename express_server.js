@@ -21,19 +21,34 @@ const emailLookup = function(email) {
   return arrayValues.find(user => email === user.email);
 };
 
+//check if the user logedin if not redirect him to login page
+const isLogedIn = function(req, res) {
+  let user = users[req.cookies[`user_id`]]
+  if (!user) {
+    res.redirect("/login");
+    return false;
+  };
+  return true;
+};
+
 
 app.use(express.urlencoded({extended: true}));
 //*******Data*************
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "jhgjg" },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "jhgjg" }
 };
 
 const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
+  "jhgjg": {
+    id: "jhgjg", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: "12345"
+  },
+  "bboop": {
+    id: "bboop", 
+    email: "vivi@example.com", 
+    password: "qwert"
   }
 }
 
@@ -45,7 +60,7 @@ app.get("/", (req, res) => {
 //Login Route
 app.get("/login", (req, res) => {
   let user = users[req.cookies[`user_id`]];
-  const templateVars = {urls: urlDatabase, user: undefined};
+  const templateVars = { user: undefined };
   res.render("login", templateVars);
 });
 
@@ -74,7 +89,7 @@ app.post("/logout", (req, res) => {
 //Register Routes
 app.get("/register", (req, res) => {
   let user = users[req.cookies[`user_id`]];
-  const templateVars = {urls: urlDatabase, user: undefined};
+  const templateVars = { user: undefined };
   res.render("register", templateVars);
 });
 
@@ -104,6 +119,10 @@ app.post("/register", (req, res) => {
 
 //URLS Routes
 app.get("/urls", (req, res) => {
+    //check if the user logedin with isLogedIn
+    if (!isLogedIn(req, res)){
+      return;
+    };
   let user = users[req.cookies[`user_id`]];
   console.log(`users`, users);
   const templateVars = {urls: urlDatabase, user: user};
@@ -113,9 +132,13 @@ app.get("/urls", (req, res) => {
 
 //URLS handler
 app.post("/urls", (req, res) => {
+    //check if the user logedin with isLogedIn
+    if (!isLogedIn(req, res)){
+      return;
+    };
   console.log(req.body);  // Log the POST request body to the console
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies[`user_id`]};
   // console.log(`urlDB`, urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 
@@ -123,34 +146,50 @@ app.post("/urls", (req, res) => {
 
 //URLS/new Routes
 app.get("/urls/new", (req, res) => {
-  let user = users[req.cookies[`user_id`]]
+  //check if the user logedin with isLogedIn
+  if (!isLogedIn(req, res)){
+    return;
+  }
+  let user = users[req.cookies[`user_id`]];
   const templateVars = {user: user};
   res.render("urls_new", templateVars);
 });
 
 //URLS
 app.get("/urls/:shortURL", (req, res) => {
+  //check if the user logedin with isLogedIn
+  if (!isLogedIn(req, res)){
+    return;
+  };
   let user = users[req.cookies[`user_id`]]
-  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: user};
+  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: user};
   res.render("urls_show", templateVars);
 });
 
-//URLS short submit handler
+//URLS update submit handler
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.newUrl;
+  //check if the user logedin with isLogedIn
+  if (!isLogedIn(req, res)){
+    return;
+  };
+  urlDatabase[req.params.shortURL].longURL = req.body.newUrl;
   res.redirect("/urls");
 });
 
 //URL delete Route
 app.post("/urls/:shortURL/delete", (req, res) => {
+    //check if the user logedin with isLogedIn
+    if (!isLogedIn(req, res)){
+      return;
+    };
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
 
 
-///////////
+///////////Redirecting to the long url
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
