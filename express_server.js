@@ -52,9 +52,6 @@ const urlDatabase = {
   "9sm5xK": { longURL: "http://www.google.com", userID: "bboop" }
 };
 
-// console.log(`urlsforusers`, urlsForUser('jhgjg'));
-// console.log(`obj.entries`, Object.entries(urlDatabase));
-
 
 const users = {
   "jhgjg": {
@@ -95,7 +92,6 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   //checking if the email already exists
-  console.log(`Login`, users,getUserByEmail(email, users));
   if (!getUserByEmail(email, users) || !bcrypt.compareSync(password, getUserByEmail(email, users).password)) {
     res.status(403).send("Email or passowrd are not valid");
     return;
@@ -137,8 +133,6 @@ app.post("/register", (req, res) => {
     res.status(400).send("Email already exists! ");
     return;
   }
-
-
   users[randomId] = {id: randomId,
     email: email,
     password: hashedPassword
@@ -147,6 +141,7 @@ app.post("/register", (req, res) => {
   req.session.userId = randomId;
   res.redirect('/urls');
 });
+
 
 //URLS Routes
 app.get("/urls", (req, res) => {
@@ -158,7 +153,6 @@ app.get("/urls", (req, res) => {
   if (!isLogedIn(req)) {
     templateVars = {urls: {}, user: user, message: "Please log in..."};
   }
-  // console.log(`vars`, templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -172,9 +166,7 @@ app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.userId};
-  // console.log(`urlDB`, urlDatabase);
   res.redirect(`/urls/${shortURL}`);
-
 });
 
 //URLS/new Routes
@@ -205,6 +197,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: user};
   res.render("urls_show", templateVars);
 });
+
 
 //URLS update submit handler
 app.post("/urls/:shortURL", (req, res) => {
