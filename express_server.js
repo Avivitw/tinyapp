@@ -71,11 +71,19 @@ const users = {
 
 //*********Routes***********
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (!isLogedIn(req)) {
+    res.redirect("/login");
+    return;
+  }
+  res.redirect("/urls");
 });
 
 //Login Route
 app.get("/login", (req, res) => {
+  if (isLogedIn(req)) {
+    res.redirect("/urls");
+    return;
+  }
   const templateVars = { user: undefined };
   res.render("login", templateVars);
 });
@@ -105,6 +113,10 @@ app.post("/logout", (req, res) => {
 
 //Register Routes
 app.get("/register", (req, res) => {
+  if (isLogedIn(req)) {
+    res.redirect("/urls");
+    return;
+  }
   const templateVars = { user: undefined };
   res.render("register", templateVars);
 });
@@ -231,17 +243,18 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 ///////////Redirecting to the long url
 app.get("/u/:shortURL", (req, res) => {
+  if (!urlDatabase[req.params.shortURL]) {
+    let user = undefined;
+    if (isLogedIn(req)) {
+      user = users[req.session.userId];
+    }
+    res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
+    return;
+  }
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
-
-
-
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
 
 app.listen(PORT, () => {
   console.log(`The app listening on port ${PORT}!`);
