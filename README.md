@@ -24,7 +24,7 @@
 - Created At (stretch)
 - Visits (stretch)
 - Linkeabl url in Index
-- Used method-override for correct REST api
+- Used method-override for correct REST api (stretch)
 
 ## Getting Started
 
