@@ -31,7 +31,7 @@
             <td><%= urls[url].longURL %></td>
             <td><%= (new Date(urls[url].createdAt)).toLocaleString('en-CA', { timeZone: 'Canada/Pacific' }) %></td>
             <td><%= urls[url].visits %></td>
-            <td><form method="POST" action="/urls/<%= url %>/delete"><button class="btn btn-outline-danger">Delete</button></form></td>
+            <td><form method="POST" action="/urls/<%= url %>?_method=DELETE"><button class="btn btn-outline-danger">Delete</button></form></td>
             <td><a class="btn btn-outline-primary" href="/urls/<%= url %>">Edit</a></td>
             
           </tr>

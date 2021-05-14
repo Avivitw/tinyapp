@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 const morgan = require("morgan");
 const bcrypt = require("bcrypt");
+const methodOverride = require('method-override');
 const { getUserByEmail } = require("./helpers");
 app.set("view engine", "ejs");//set ejs as the view engine
 let cookieSession = require("cookie-session");
@@ -11,7 +12,7 @@ app.use(cookieSession({
   name: 'session',
   keys: ['userId']
 }));
-
+app.use(methodOverride('_method'));
 
 const generateRandomString = function() {
   //returns a string of 6 random alphanumeric characters
@@ -199,7 +200,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 
 //URLS update submit handler
-app.post("/urls/:shortURL", (req, res) => {
+app.put("/urls/:shortURL", (req, res) => {
   //check if the user logedin with isLogedIn
   if (!isLogedIn(req)) {
     res.render("message", {message: "Please log in...", user: undefined});
@@ -216,7 +217,7 @@ app.post("/urls/:shortURL", (req, res) => {
 });
 
 //URL delete Route
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL", (req, res) => {
   //check if the user logedin with isLogedIn
   if (!isLogedIn(req)) {
     res.render("message", {message: "Please log in...", user: undefined});
