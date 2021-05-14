@@ -4,8 +4,9 @@
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["screenshot of URLs page"](https://github.com/Avivitw/tinyapp/blob/master/docs/urls-page.png?raw=true)
+!["screenshot of edit URL page"](https://github.com/Avivitw/tinyapp/blob/master/docs/editurl-page.png?raw=true)
+!["screenshot of registration page"](https://github.com/Avivitw/tinyapp/blob/master/docs/register-page.png?raw=true)
 
 ## Dependencies
 
