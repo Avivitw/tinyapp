@@ -4,8 +4,8 @@
 
 ## Final Product
 
-!["screenshot of URLs page"](https://github.com/Avivitw/tinyapp/blob/master/docs/urls-page.png?raw=true)
-!["screenshot of edit URL page"](https://github.com/Avivitw/tinyapp/blob/master/docs/editurl-page.png?raw=true)
+!["screenshot of URLs page"](https://github.com/Avivitw/tinyapp/blob/master/docs/urls-page.png?raw=true&v=1)
+!["screenshot of edit URL page"](https://github.com/Avivitw/tinyapp/blob/master/docs/editurl-page.png?raw=true&v=1)
 !["screenshot of registration page"](https://github.com/Avivitw/tinyapp/blob/master/docs/register-page.png?raw=true)
 
 ## Dependencies
@@ -16,6 +16,15 @@
 - bcrypt
 - body-parser
 - cookie-session
+- method-override
+- morgan
+
+## Stretch/Additional Features
+
+- Created At (stretch)
+- Visits (stretch)
+- Linkeabl url in Index
+- Used method-override for correct REST api
 
 ## Getting Started
 
