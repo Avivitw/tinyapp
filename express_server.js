@@ -48,8 +48,8 @@ app.use(express.urlencoded({extended: true}));
 
 //*******Data*************
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "jhgjg" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "bboop" }
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "jhgjg", createdAt: 1620968543240, visits: 0},
+  "9sm5xK": { longURL: "http://www.google.com", userID: "bboop", createdAt: 1620968553240, visits: 0}
 };
 
 
@@ -148,7 +148,6 @@ app.get("/urls", (req, res) => {
   //check if the user logedin with isLogedIn
   let user = users[req.session.userId];
   let urls = urlsForUser(req.session.userId);
-  console.log(`users`, users);
   let templateVars = {urls: urls, user: user, message: undefined};
   if (!isLogedIn(req)) {
     templateVars = {urls: {}, user: user, message: "Please log in..."};
@@ -165,7 +164,7 @@ app.post("/urls", (req, res) => {
   }
   console.log(req.body);  // Log the POST request body to the console
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.userId};
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.userId, createdAt: Date.now(), visits: 0};
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -194,7 +193,7 @@ app.get("/urls/:shortURL", (req, res) => {
     res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
     return;
   }
-  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: user};
+  const templateVars = {shortURL: req.params.shortURL, URL: urlDatabase[req.params.shortURL], user: user};
   res.render("urls_show", templateVars);
 });
 
@@ -244,6 +243,7 @@ app.get("/u/:shortURL", (req, res) => {
     res.render("message", {message: "The requested URL does not exist or does not belong to you", user: user});
     return;
   }
+  urlDatabase[req.params.shortURL].visits ++;
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });

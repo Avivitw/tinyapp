@@ -18,6 +18,8 @@
         <tr>
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Created At</th>
+          <th scope="col">Visits</th>
           <th scope="col">Delete</th>
           <th scope="col">Edit</th>
         </tr>
@@ -27,6 +29,8 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url].longURL %></td>
+            <td><%= (new Date(urls[url].createdAt)).toLocaleString('en-CA', { timeZone: 'Canada/Pacific' }) %></td>
+            <td><%= urls[url].visits %></td>
             <td><form method="POST" action="/urls/<%= url %>/delete"><button class="btn btn-outline-danger">Delete</button></form></td>
             <td><a class="btn btn-outline-primary" href="/urls/<%= url %>">Edit</a></td>
             
